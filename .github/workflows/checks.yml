@@ -1,0 +1,25 @@
+---
+#github action의 이름
+name: Checks
+
+#github action의 트리거
+# push 동작을 할 때 실행할 것이라는 뜻임.
+on: [push]
+
+jobs:
+  test-lint:
+    name: Test and lint
+    # 일반적으로 OS를 설정
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          dockerhub-username: ${{secrets.DOCKERHUB_USERNAME}}
+          dockerhub-password: ${{secrets.DOCKERHUB_TOKEN}}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Test
+        run: docker-compose run --rm app sh -c "python manage.py test"
+      - name: Lint
+        run: docker-compose run --rm app sh -c "flake8"
