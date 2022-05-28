@@ -13,11 +13,16 @@ EXPOSE 8000
 ARG DEV=false
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
+    # postgresql-client intall pycopgy2가 postgressql에 접속할 수 있도록 함.
+    apk add --update --no-cache postgresql-client && \
+    apk add --update --no-cache --virtual .tmp-bulid-deps \
+      build-base postgresql-dev musl-dev && \ 
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ "$DEV" = true ]; \
         then /py/bin/pip install -r /tmp/requirements.dev.txt; \
     fi && \
     rm -rf /tmp && \
+    apk del .tmp-bulid-deps && \
     adduser \
         --no-create-home \
         --disabled-password \
